@@ -3,14 +3,17 @@ Author: junzhengrice@gmail.com
 '''
 class TrieNode:
     def __init__(self, key):
-        self.key = key
+        self.ended = False
+        self.key = key 
         self.children  = {}
 
     '''
     Add a new string to trie
     '''
     def add(self,key,offset):
-        if offset < len(key):
+        if offset == len(key):
+            self.ended = True
+        elif offset < len(key):
             char = key[offset]
             if char not in self.children:
                 self.children[char] = TrieNode(key[:offset+1])
@@ -21,7 +24,7 @@ class TrieNode:
     '''
     def contains(self, key, offset):
         if offset == len(key):
-            return key == self.key 
+            return self.ended 
         if offset <  len(key):
             char = key[offset]
             if char in self.children:
@@ -33,11 +36,10 @@ class TrieNode:
     '''
     def find(self,key,offset,container):
         if offset == len(key):
-            if bool(self.children) == False:
+            if self.ended is True:
                 container.append(self.key)
-            else:
-                for char in self.children:
-                    self.children[char].find(key,offset,container)
+            for char in self.children:
+                self.children[char].find(key,offset,container)
         else:
             char = key[offset]
             if char in self.children:
