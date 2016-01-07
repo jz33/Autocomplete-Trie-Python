@@ -1,15 +1,12 @@
-import Utilities
+from Utilities import LoadFile
 from View import View
 from Model import Model
 from Tkinter import Tk
 '''
 Author: junzhengrice@gmail.com
 '''
-'''
-words_109582.txt 
-words_598153.txt
-'''
-FILE_NAME = 'words_109582.txt'
+# FILE_NAME = 'words_109582.txt'
+FILE_NAME = 'words_598153.txt'
 
 class Controller(object):
     def __init__(self, filename):
@@ -29,9 +26,12 @@ class Controller(object):
     
     def List(self,tag):
         return self.model.List(tag)
-  
+    
+    def SwitchCommand(self):
+        self.model.SwitchCommand()
+    
     def LoadFile(self):
-        return list(Utilities.LoadFile(self.filename));
+        return list(LoadFile(self.filename));
         
         
 #main
