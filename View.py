@@ -1,4 +1,4 @@
-import Utilities
+from Utilities import CenterWindow
 from Tkinter import Tk, StringVar
 from ttk import Frame,Button,Combobox
 '''
@@ -8,15 +8,15 @@ class View(Frame):
     def __init__(self, parent,controller):
         Frame.__init__(self, parent)   
         self.parent = parent
-        self.parent.title("Autocomplete")
+        self.parent.title("Autocompleter")
         
         self.pack(fill = 'both', expand = 1)
         
         self.initializeComponents()
-        Utilities.CenterWindow(self.parent)
+        CenterWindow(self.parent)
         
         self.controller = controller
-    
+
     def initializeComponents(self):
         self.boxValue = StringVar()
         self.boxValue.trace('w', \
@@ -35,50 +35,60 @@ class View(Frame):
         
         self.importButton = Button(self, \
             text = "Import", \
-            command = self.importDict,\
+            command = self.importButton_clicked,\
         )
         self.importButton.pack(side = 'left',expand = 1)
         
-        self.quitButton = Button(self, \
-            text = "Close", \
-            command = self.quit, \
+        self.cmd_str = StringVar(None,"Prefix Only")
+        self.switchButton = Button(self, \
+            textvariable = self.cmd_str, \
+            command = self.switchButton_clicked, \
         )
-        self.quitButton.pack(side = 'right', padx = 5, pady = 5)
+        self.switchButton.pack(side = 'right', padx = 5, pady = 5)
        
     #******************Callbacks******************
-    '''
-    Edit current text in combo box will trigger autocomplete
-    '''
     def box_valueEditted(self,sv):
-        tag = sv.get()
+        '''
+        Edit text of combo box will trigger autocomplete
+        This implementation is moved to "box_returned"
+        '''
+        pass
+
+    def box_selected(self,event):
+        '''
+        Selecting 1 value of dropdown list finds all strings 
+        with this prefix. Testing only.
+        '''
+        # tag = event.widget.get()
+        # print self.controller.Contains(tag)
+        pass
+
+    def box_returned(self,event):
+        '''
+        Press 'return' will show combo box's dropdown list
+        '''
+        tag = self.boxValue.get()
         container = self.controller.List(tag)
         self.box['value'] = [] # clear
         self.box['value'] = container
-        '''
-        Turn on dropdown list will cause refreshing lag 
-        when test case is too large. Mouse click down arrow or 
-        press "down" in key board to explore list
-        '''
-        #self.box.event_generate('<Down>')
-    
-    '''
-    Select 1 value in dropdown list will find this value in Trie.
-    This callback is for testing
-    '''
-    def box_selected(self,event):
-        tag = event.widget.get()
-        print self.controller.Contains(tag) # expect True
-     
-    '''
-    Press 'return' will show combo box's dropdown list
-    '''
-    def box_returned(self,event):
         self.box.event_generate('<Down>')
-     
-    '''       
-    Press 'import' button will import test file and initialize trie
-    '''        
-    def importDict(self):
+            
+    def importButton_clicked(self):
+        '''       
+        Press 'import' button will import test file and initialize Trie
+        '''
         self.box['value'] = self.controller.LoadFile()   
         self.controller.Construct()
+        
+    def switchButton_clicked(self):
+        '''
+        Press will switch between 
+        'Prefix Only' and 'Prefix and Infix' mode
+        '''
+        self.controller.SwitchCommand()
+        cmd_str = self.cmd_str.get()
+        if cmd_str == 'Prefix Only':
+            self.cmd_str.set('Prefix and Infix')
+        else:
+            self.cmd_str.set('Prefix Only')
         
